@@ -3,33 +3,12 @@ name: Build
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
-    inputs:
-      logLevel:
-        description: "Log level"
-        required: true
-        default: "debug"
-        type: choice
-        options:
-          - info
-          - warning
-          - debug
-      tags:
-        description: "Test scenario tags"
-        required: false
-        type: boolean
-      environment:
-        description: "Environment to run tests against"
-        type: environment
-        required: false
 
 jobs:
   build:
     name: Build and Push
     runs-on: [ocean]
-    if: contains(github.event.head_commit.message, '#build')
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -65,18 +44,14 @@ jobs:
         run: echo "BRANCH_NAME=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
 
       - name: Build and push multi-arch image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile
-          platforms: linux/amd64,linux/arm64,linux/armhf,linux/i386,linux/s390x
+          platforms: linux/amd64,linux/arm64
           push: true
+          no-cache: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/${{ steps.repo_name.outputs.REPO_NAME }}:latest
             ghcr.io/${{ github.repository_owner }}/${{ steps.repo_name.outputs.REPO_NAME }}:${{ env.TAG_NAME }}
-          labels: |
-            org.opencontainers.image.description=Multi-Arch ${{ steps.repo_name.outputs.REPO_NAME }} Image
-          build-args: |
-            BUILDPLATFORM=${{ runner.os }}/${{ runner.arch }}
-            NO_CACHE=true
           provenance: false
