@@ -31,7 +31,7 @@ jobs:
       - name: Delete Existing Tag
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
-          VERSION=$(date +'%Y%m%d')
+          VERSION=$(date +'%Y%m%d%H%M%S')
           TAG_NAME="v${VERSION}"
           if git rev-parse $TAG_NAME >/dev/null 2>&1; then
             git tag -d $TAG_NAME
@@ -41,7 +41,7 @@ jobs:
       - name: Create a Single Tag
         id: create_tag
         run: |
-          VERSION=$(date +'%Y%m%d')
+          VERSION=$(date +'%Y%m%d%H%M%S')
           echo "TAG_NAME=v${VERSION}" >> $GITHUB_OUTPUT
           echo "Created TAG_NAME=$TAG_NAME"
 
