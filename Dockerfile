@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:1.23.1-alpine AS builder
+FROM ghcr.io/konamata/golang-upx:1.23.1-bookworm AS builder
 
 WORKDIR /app
 
@@ -16,6 +16,7 @@ COPY ./main.go .
 
 # Build the Go app
 RUN CGO_ENABLED=0 GOARCH=$TARGETARCH GOOS=linux go build -o aws-mfa-go -a -ldflags="-s -w" -installsuffix cgo
+RUN upx --ultra-brute aws-mfa-go && upx -t aws-mfa-go
 
 # Final stage
 FROM scratch AS final
