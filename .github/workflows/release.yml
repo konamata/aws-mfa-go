@@ -43,19 +43,19 @@ jobs:
         run: |
           VERSION=$(date +'%Y%m%d%H%M%S')
           TAG_NAME="v${VERSION}"
-          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_OUTPUT
           echo "Created TAG_NAME=${TAG_NAME}"
 
       - name: Create and Push Tag
         run: |
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor }}@users.noreply.github.com"
-          git tag ${{ env.TAG_NAME }}
-          git push origin ${{ env.TAG_NAME }}
+          git tag ${{ steps.create_tag.outputs.TAG_NAME }}
+          git push origin ${{ steps.create_tag.outputs.TAG_NAME }}
 
       - name: Build Binary for Release
         run: |
-          BINARY_NAME=aws-mfa-go-${{ matrix.os }}-${{ matrix.arch }}-${{ env.TAG_NAME }}
+          BINARY_NAME=aws-mfa-go-${{ matrix.os }}-${{ matrix.arch }}-${{ steps.create_tag.outputs.TAG_NAME }}
           if [ "${{ matrix.os }}" == "windows" ]; then
             BINARY_NAME="${BINARY_NAME}.exe"
           fi
@@ -63,7 +63,7 @@ jobs:
 
       - name: Verify Binary Existence
         run: |
-          BINARY_NAME=aws-mfa-go-${{ matrix.os }}-${{ matrix.arch }}-${{ env.TAG_NAME }}
+          BINARY_NAME=aws-mfa-go-${{ matrix.os }}-${{ matrix.arch }}-${{ steps.create_tag.outputs.TAG_NAME }}
           if [ "${{ matrix.os }}" == "windows" ]; then
             BINARY_NAME="${BINARY_NAME}.exe"
           fi
@@ -73,9 +73,9 @@ jobs:
       - name: Create Release and Upload Assets
         uses: softprops/action-gh-release@v1
         with:
-          files: aws-mfa-go-${{ matrix.os }}-${{ matrix.arch }}-${{ env.TAG_NAME }}*
-          tag_name: ${{ env.TAG_NAME }}
-          name: ${{ env.TAG_NAME }}
+          files: aws-mfa-go-${{ matrix.os }}-${{ matrix.arch }}-${{ steps.create_tag.outputs.TAG_NAME }}*
+          tag_name: ${{ steps.create_tag.outputs.TAG_NAME }}
+          name: ${{ steps.create_tag.outputs.TAG_NAME }}
           draft: false
           prerelease: false
         env:
