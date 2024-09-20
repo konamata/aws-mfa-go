@@ -54,7 +54,7 @@ jobs:
 
       - name: Upload Release Assets
         if: success()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: aws-mfa-go-${{ matrix.os }}-${{ matrix.arch }}
           path: |
@@ -62,10 +62,23 @@ jobs:
 
       - name: Create Release
         if: success()
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.create_tag.outputs.TAG_NAME }}
-          name: ${{ steps.create_tag.outputs.TAG_NAME }}
-          files: aws-mfa-go-${{ matrix.os }}-${{ matrix.arch }}-${{ steps.create_tag.outputs.TAG_NAME }}*
+        id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.MY_PAT_TOKEN }}
+        with:
+          tag_name: ${{ steps.create_tag.outputs.TAG_NAME }}
+          release_name: ${{ steps.create_tag.outputs.TAG_NAME }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Assets to GitHub Release
+        if: success()
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_PAT_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: aws-mfa-go-${{ matrix.os }}-${{ matrix.arch }}-${{ steps.create_tag.outputs.TAG_NAME }}
+          asset_name: aws-mfa-go-${{ matrix.os }}-${{ matrix.arch }}-${{ steps.create_tag.outputs.TAG_NAME }}
+          asset_content_type: application/octet-stream
