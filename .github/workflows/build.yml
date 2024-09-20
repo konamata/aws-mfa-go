@@ -5,6 +5,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build and Push
@@ -31,8 +35,8 @@ jobs:
       - name: Create a Single Tag
         id: create_tag
         run: |
-          VERSION=$(date +'%Y%m%d')-${GITHUB_SHA}
-          echo "TAG_NAME=v${VERSION}" >> $GITHUB_ENV
+          VERSION=$(date +'%Y%m%d')
+          echo "TAG_NAME=v${VERSION}" >> $GITHUB_OUTPUT
           echo "Created TAG_NAME=$TAG_NAME"
 
       - name: Extract repository name
@@ -53,5 +57,5 @@ jobs:
           no-cache: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/${{ steps.repo_name.outputs.REPO_NAME }}:latest
-            ghcr.io/${{ github.repository_owner }}/${{ steps.repo_name.outputs.REPO_NAME }}:${{ env.TAG_NAME }}
+            ghcr.io/${{ github.repository_owner }}/${{ steps.repo_name.outputs.REPO_NAME }}:${{ steps.create_tag.outputs.TAG_NAME }}
           provenance: false
