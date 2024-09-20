@@ -62,7 +62,7 @@ jobs:
 
       - name: Create Release
         if: success()
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.create_tag.outputs.TAG_NAME }}
           name: ${{ steps.create_tag.outputs.TAG_NAME }}
