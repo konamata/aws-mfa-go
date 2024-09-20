@@ -1,4 +1,4 @@
-module github.com/bariiss/aws-mfa-go
+module github.com/konamata/aws-mfa-go
 
 go 1.23.0
 

@@ -8,17 +8,15 @@ import (
 	"path/filepath"
 	"time"
 
-	u "github.com/bariiss/aws-mfa-go/util"
 	"github.com/fatih/color"
+	u "github.com/konamata/aws-mfa-go/util"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 )
 
-var (
-	awsProfile, awsRegion = os.Getenv("AWS_MFA_GO_USER"), os.Getenv("AWS_MFA_GO_REGION")
-)
+var awsProfile, awsRegion = os.Getenv("AWS_MFA_GO_USER"), os.Getenv("AWS_MFA_GO_REGION")
 
 func main() {
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
